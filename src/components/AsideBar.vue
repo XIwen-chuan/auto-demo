@@ -1,6 +1,6 @@
 <template>
   <div class="_asidebar">
-    <el-menu default-active="2" class="el-menu-vertical-demo">
+    <el-menu default-active="1" class="el-menu-vertical-demo">
       <el-menu-item index="1" @click="menuItemClick">
         <el-icon><List /></el-icon>
         <span>Protocol List</span>
@@ -18,8 +18,9 @@ import { List, Search } from "@element-plus/icons-vue";
 import { defineEmits } from "vue";
 const emits = defineEmits(["menuItemClick"]);
 
-const menuItemClick = (item: any) => {
+const menuItemClick = (item: any, item2: any) => {
   console.log(item);
+  console.log(item2);
   emits("menuItemClick", item.index);
 };
 </script>

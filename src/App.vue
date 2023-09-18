@@ -18,6 +18,9 @@
 <script lang="ts" setup>
 import AsideBar from "@/components/AsideBar.vue";
 import router from "./router";
+import { useProtocolStore } from "@/store";
+
+const protocalStore = useProtocolStore();
 
 const menuItemClickHandler = (itemIndex: number) => {
   router.push({ name: itemIndex == 1 ? "home" : "search" });
@@ -38,15 +41,13 @@ const menuItemClickHandler = (itemIndex: number) => {
     justify-content: center;
     font-size: larger;
     font-weight: bolder;
+    color: white;
   }
   .el-aside {
     background-color: var(--primary-light7);
   }
   .el-container {
     min-height: calc(100vh - 60px);
-  }
-  .el-main {
-    background-color: var(--primary-light9);
   }
   .el-backtop {
     background-color: var(--primary-light5);

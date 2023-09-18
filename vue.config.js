@@ -15,4 +15,19 @@ module.exports = defineConfig({
       }),
     ],
   },
+  devServer: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        ws: true,
+        changeOrigin: true,
+      },
+      "/search-test": {
+        target:
+          "https://cc94467d881a4334a44fd40e5d12085a.asia-east1.gcp.elastic-cloud.com:443",
+        ws: true,
+        changeOrigin: true,
+      },
+    },
+  },
 });
