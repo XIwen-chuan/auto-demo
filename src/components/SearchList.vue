@@ -21,7 +21,11 @@
       <el-table-column prop="_score" label="Search Score" :align="`center`" />
       <el-table-column fixed="right" label="Operations" :align="`center`">
         <template #default="scope">
-          <el-button link type="primary" size="small" :disabled="true"
+          <el-button
+            link
+            type="primary"
+            size="small"
+            @click="graphClickHandler(scope)"
             >Graph</el-button
           >
           <el-button
@@ -40,6 +44,7 @@
 <script lang="ts" setup>
 import { defineProps, reactive } from "vue";
 import * as models from "@/models";
+import router from "@/router";
 const props = defineProps<{
   tableData: models.searchHitM[];
 }>();
@@ -56,6 +61,15 @@ const detailClickHandler = async (scope: any) => {
   }
   const path = `https://helixon.yzhu.io/#/protocol-item/${identity}/view`;
   window.open(path);
+};
+
+const graphClickHandler = async (scope: any) => {
+  router.push({
+    name: "protocol",
+    params: {
+      filename: scope.row._source.name,
+    },
+  });
 };
 </script>
 

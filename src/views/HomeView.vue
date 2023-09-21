@@ -1,27 +1,40 @@
 <template>
   <div class="_protocols">
-    <h1>Nodes:</h1>
-    <ProtocolList :table-data="state.tableData" />
-  </div>
-  <div class="demo-pagination-block">
-    <el-pagination
-      v-model:current-page="state.currentPage"
-      v-model:page-size="state.pageSize"
-      :background="true"
-      layout="prev, pager, next, jumper"
-      :total="3000"
-      @current-change="handleCurrentChange"
-    />
+    <div class="protocols-list">
+      <h1>Protocols:</h1>
+      <div class="demo-pagination-block">
+        <el-pagination
+          v-model:current-page="state.currentPage"
+          v-model:page-size="state.pageSize"
+          :background="true"
+          layout="prev, pager, next, jumper"
+          :total="3000"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+      <ProtocolList :table-data="state.tableData" />
+    </div>
+    <div class="demo-pagination-block">
+      <el-pagination
+        v-model:current-page="state.currentPage"
+        v-model:page-size="state.pageSize"
+        :background="true"
+        layout="prev, pager, next, jumper"
+        :total="3000"
+        @current-change="handleCurrentChange"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import AnnotationForm from "@/components/AnnotationForm.vue";
 import ProtocolList from "@/components/ProtocolList.vue";
 import { ref, defineEmits, nextTick, reactive, onMounted } from "vue";
+import { useProtocolStore } from "@/store";
 import * as models from "@/models";
 import * as api from "@/api";
 
+const protocolStore = useProtocolStore();
 const parentBorder = ref(false);
 const childBorder = ref(false);
 const emits = defineEmits(["cell-btn-click"]);
@@ -49,6 +62,10 @@ const handleCurrentChange = async (val: number) => {
   console.log(`current page: ${val}`);
   state.currentPage = val;
   const res = await getProtocolList();
+  if (!res) {
+    protocolStore.reportNetworkError();
+    return;
+  }
   state.tableData = res;
 };
 
@@ -62,7 +79,24 @@ const getProtocolList = async () => {
 
 onMounted(async () => {
   const res = await getProtocolList();
+  if (!res) {
+    protocolStore.reportNetworkError();
+    return;
+  }
   console.log(res);
   state.tableData = res;
 });
 </script>
+
+<style lang="scss" scoped>
+._protocols {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  .demo-pagination-block {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+}
+</style>

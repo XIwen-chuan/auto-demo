@@ -13,3 +13,23 @@ app.use(pinia);
 app.use(ElementPlus);
 app.use(router);
 app.mount("#app");
+
+const debounce = (fn: any, delay: number) => {
+  let timer: any;
+  return (...args: any[]) => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+};
+
+const _ResizeObserver = window.ResizeObserver;
+window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
+  constructor(callback: any) {
+    callback = debounce(callback, 200);
+    super(callback);
+  }
+};

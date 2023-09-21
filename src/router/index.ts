@@ -14,6 +14,11 @@ const routes: Array<RouteRecordRaw> = [
     // which is lazy-loaded when the route is visited.
     component: () => import("@/views/SearchView.vue"),
   },
+  {
+    path: "/protocol/:filename",
+    name: "protocol",
+    component: () => import("@/views/ProtocolGraph.vue"),
+  },
 ];
 
 const router = createRouter({

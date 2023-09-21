@@ -1,30 +1,48 @@
-export interface Line {
-  stroke: string;
+export enum AttributeM {
+  slot = "slot",
+  emit = "emit",
+}
+export interface Slot {
+  key: string;
+  value: string;
+  id: string;
+  node_id: string;
 }
 
-export interface Attr {
-  line: Line;
+export interface Emit {
+  key: string;
+  value: string;
+  id: string;
+  node_id: string;
+}
+
+export interface Node {
+  id: string;
+  text: string;
+  instruction: string;
+  slots: Slot[];
+  emits: Emit[];
 }
 
 export interface Source {
-  cell: string;
-  port: string;
+  node_id: string;
+  attr_id: string;
 }
 
 export interface Target {
-  cell: string;
-  port: string;
+  node_id: string;
+  attr_id: string;
 }
 
-export interface Cell {
-  shape: string;
-  attrs: Attr;
+export interface Edge {
   id: string;
-  zIndex: number;
   source: Source;
   target: Target;
+  text: string;
 }
 
 export interface GraphM {
-  cells: Cell[];
+  name: string;
+  nodes: Node[];
+  edges: Edge[];
 }

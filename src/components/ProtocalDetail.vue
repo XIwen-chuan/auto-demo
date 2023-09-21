@@ -1,320 +1,71 @@
 <template>
-  <div class="_protocols">
-    <h1>Nodes:</h1>
-    <el-table
-      :data="tableData"
-      :border="parentBorder"
-      style="width: 100%"
-      @cell-click="cellClickHandler"
-    >
-      <el-table-column type="expand">
-        <template #default="props">
-          <div m="4">
-            <p m="t-0 b-2">State: {{ props.row.state }}</p>
-            <p m="t-0 b-2">City: {{ props.row.city }}</p>
-            <p m="t-0 b-2">Address: {{ props.row.address }}</p>
-            <p m="t-0 b-2">Zip: {{ props.row.zip }}</p>
-            <h3>Family</h3>
-            <el-table :data="props.row.family" :border="childBorder">
-              <el-table-column label="Name" prop="name" />
-              <el-table-column label="State" prop="state" />
-              <el-table-column label="City" prop="city" />
-              <el-table-column label="Address" prop="address" />
-              <el-table-column label="Zip" prop="zip" />
-            </el-table>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="Date" prop="date" />
-      <el-table-column label="Name" prop="name" />
-      <el-table-column fixed="right" label="Operations" width="120">
-        <template #default>
-          <el-button link type="primary" size="small" @click="handleClick"
-            >Edit</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-divider />
-    <h1>Edges:</h1>
-    <el-table :data="edgeData" style="width: 100%">
-      <el-table-column prop="source" label="source" width="180" />
-      <el-table-column prop="target" label="target" width="180" />
-      <el-table-column prop="content" label="content" />
-    </el-table>
-    <div class="annotation-form" v-if="state.showDialog">
-      <AnnotationForm @close-dialog-click="state.showDialog = false" />
+  <div class="_protocol-detail">
+    <h2 class="paper-title" v-html="props.tableData.title" />
+    <div class="paper-authors">
+      <p>
+        Authors:
+        <span
+          v-for="(author, index) in props.tableData.attributes.authors"
+          v-bind:key="index"
+          >{{ author.firstName + " " + author.lastName + ", " }}</span
+        >
+      </p>
+    </div>
+    <div class="paper-details">
+      <p>
+        URL:
+        <a :href="props.tableData.attributes.doiUrl">{{
+          props.tableData.attributes.doiUrl
+        }}</a>
+      </p>
+      <p>Creation Time: {{ props.tableData.attributes.createdAt }}</p>
+      <p>Institution: {{ props.tableData.attributes.institution }}</p>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import AnnotationForm from "@/components/AnnotationForm.vue";
-import { ref, defineEmits, nextTick, reactive } from "vue";
+import { defineProps } from "vue";
+import * as models from "@/models";
 
-const parentBorder = ref(false);
-const childBorder = ref(false);
-const emits = defineEmits(["cell-btn-click"]);
-const tableData = [
-  {
-    date: "2016-05-03",
-    name: "Tom",
-    state: "California",
-    city: "San Francisco",
-    address: "3650 21st St, San Francisco",
-    zip: "CA 94114",
-    family: [
-      {
-        name: "Jerry",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Spike",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Tyke",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-    ],
-  },
-  {
-    date: "2016-05-02",
-    name: "Tom",
-    state: "California",
-    city: "San Francisco",
-    address: "3650 21st St, San Francisco",
-    zip: "CA 94114",
-    family: [
-      {
-        name: "Jerry",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Spike",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Tyke",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-    ],
-  },
-  {
-    date: "2016-05-04",
-    name: "Tom",
-    state: "California",
-    city: "San Francisco",
-    address: "3650 21st St, San Francisco",
-    zip: "CA 94114",
-    family: [
-      {
-        name: "Jerry",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Spike",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Tyke",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-    ],
-  },
-  {
-    date: "2016-05-01",
-    name: "Tom",
-    state: "California",
-    city: "San Francisco",
-    address: "3650 21st St, San Francisco",
-    zip: "CA 94114",
-    family: [
-      {
-        name: "Jerry",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Spike",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Tyke",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-    ],
-  },
-  {
-    date: "2016-05-08",
-    name: "Tom",
-    state: "California",
-    city: "San Francisco",
-    address: "3650 21st St, San Francisco",
-    zip: "CA 94114",
-    family: [
-      {
-        name: "Jerry",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Spike",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Tyke",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-    ],
-  },
-  {
-    date: "2016-05-06",
-    name: "Tom",
-    state: "California",
-    city: "San Francisco",
-    address: "3650 21st St, San Francisco",
-    zip: "CA 94114",
-    family: [
-      {
-        name: "Jerry",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Spike",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Tyke",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-    ],
-  },
-  {
-    date: "2016-05-07",
-    name: "Tom",
-    state: "California",
-    city: "San Francisco",
-    address: "3650 21st St, San Francisco",
-    zip: "CA 94114",
-    family: [
-      {
-        name: "Jerry",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Spike",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-      {
-        name: "Tyke",
-        state: "California",
-        city: "San Francisco",
-        address: "3650 21st St, San Francisco",
-        zip: "CA 94114",
-      },
-    ],
-  },
-];
-
-const state = reactive({
-  cellClicked: {} as any,
-  showDialog: false,
-});
-
-const cellClickHandler = (item: any) => {
-  console.log(item);
-  state.cellClicked = item;
-};
-
-const handleClick = async (item: any) => {
-  await nextTick();
-  emits("cell-btn-click", state.cellClicked);
-  state.showDialog = true;
-};
-
-const edgeData = [
-  {
-    id: "2016-05-03",
-    source: "2",
-    target: "4",
-    content: "this is a edge content",
-  },
-  {
-    id: "2016-05-02",
-    source: "2",
-    target: "4",
-    content: "this is a edge content",
-  },
-  {
-    id: "2016-05-04",
-    source: "2",
-    target: "4",
-    content: "this is a edge content",
-  },
-  {
-    id: "2016-05-01",
-    source: "2",
-    target: "4",
-    content: "this is a edge content",
-  },
-];
+const props = defineProps<{
+  tableData: models.ProtocalM;
+}>();
 </script>
+
+<style lang="scss" scoped>
+._protocol-detail {
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  font-family: Arial, sans-serif;
+
+  .paper-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .paper-authors {
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+
+  .paper-details {
+    font-size: 14px;
+
+    p {
+      margin: 5px 0;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+</style>

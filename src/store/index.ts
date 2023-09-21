@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ElMessage } from "element-plus";
 import { defineStore } from "pinia";
 
 // You can name the return value of `defineStore()` anything you want,
@@ -31,6 +32,12 @@ export const useProtocolStore = defineStore("protocolStore", {
       } catch (error) {
         console.error("加载和解析JSON时出错：", error);
       }
+    },
+    reportNetworkError() {
+      ElMessage.error("Network error.");
+    },
+    reportNotFoundError(name: string) {
+      ElMessage.info(name + " not found.");
     },
   },
 });

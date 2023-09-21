@@ -67,7 +67,7 @@ export async function reqGetProtocol(filename: string) {
   });
   if (!res.data.code) {
     ElMessage.error("Network error");
-    return [];
+    return false;
   }
 
   return res.data as models.ProtocalM;
@@ -85,7 +85,7 @@ export async function reqGetProtocolList(skip = 0, limit = 15) {
   });
   if (!res.data.code) {
     ElMessage.error("Network error");
-    return [];
+    return false;
   }
 
   return res.data as models.ProtocalM[];
@@ -101,9 +101,113 @@ export async function reqGetGraph(filename: string) {
     method: "get",
   });
   if (!res.data.code) {
-    ElMessage.error("Network error");
-    return [];
+    return false;
   }
 
   return res.data as models.GraphM;
+}
+
+export async function reqAddEdge(
+  filename: string,
+  source: models.Source,
+  target: models.Target,
+  text: string
+) {
+  const params = {
+    filename,
+    source_node_id: source.node_id,
+    source_attr_id: source.attr_id,
+    target_node_id: target.node_id,
+    target_attr_id: target.attr_id,
+    text,
+  };
+  const res = await requests({
+    url: "api/edge/",
+    params,
+    method: "post",
+  });
+  console.log("reqAddEdge");
+  return true;
+}
+
+export async function reqDeleteEdge(filename: string, id: string) {
+  const params = {
+    filename,
+    edge_id: id,
+  };
+  await requests({
+    url: "api/edge/",
+    params,
+    method: "delete",
+  });
+  return true;
+}
+
+export async function reqModifyInstruction(
+  filename: string,
+  node_id: string,
+  newIntru: string
+) {
+  const params = {
+    filename,
+    node_id,
+    new_instruction: newIntru,
+  };
+  await requests({
+    url: "api/instruction/",
+    params,
+    method: "put",
+  });
+  console.log("reqModifyInstruction");
+  return true;
+}
+
+export async function reqDeleteAttr(
+  filename: string,
+  node_id: string,
+  attr_id: string
+) {
+  const params = {
+    filename,
+    attr_id,
+  };
+  await requests({
+    url: "api/attr/",
+    params,
+    method: "delete",
+  });
+  console.log("reqDeleteAttr");
+  return true;
+}
+
+export async function reqAddAttr(
+  filename: string,
+  node_id: string,
+  key: string,
+  value: string,
+  type: models.AttributeM
+) {
+  const params = {
+    filename,
+    node_id,
+    key,
+    value,
+    attr_type: type,
+  };
+  await requests({
+    url: "api/attr/",
+    params,
+    method: "post",
+  });
+  console.log("reqAddAttr");
+  return true;
+}
+
+// done
+export async function reqUploadOldGraphJson() {
+  console.log("reqUploadOldGraphJson");
+}
+
+export async function reqDownloadGraphJson(filename: string) {
+  console.log("reqDownloadGraphJson");
 }

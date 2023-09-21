@@ -24,8 +24,7 @@
             link
             type="primary"
             size="small"
-            @click="handleClick"
-            :disabled="true"
+            @click="graphClickHandler(scope)"
             >Graph</el-button
           >
           <el-button
@@ -57,5 +56,15 @@ const detailClickHandler = async (scope: any) => {
   console.log(scope);
   const path = `https://helixon.yzhu.io/#/protocol-item/${scope.row.identity}/view`;
   window.open(path);
+};
+
+const graphClickHandler = async (scope: any) => {
+  const filename = "protocol_" + scope.row.identity + ".json";
+  router.push({
+    name: "protocol",
+    params: {
+      filename,
+    },
+  });
 };
 </script>
