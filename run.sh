@@ -1,5 +1,5 @@
 docker build . -t my-app
 docker run \
 -d --name my-app \
---network=host \
+-p 8080:80 \
 my-app
