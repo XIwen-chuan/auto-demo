@@ -155,11 +155,10 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, ref, reactive } from "vue";
+import { defineProps, ref, reactive, nextTick } from "vue";
 import * as models from "@/models";
 import * as api from "@/api";
 import { ElMessageBox } from "element-plus";
-import { useRoute } from "vue-router";
 import router from "@/router";
 
 const state = reactive({
@@ -180,10 +179,6 @@ const state = reactive({
     value: "",
   },
 });
-
-const onSubmit = () => {
-  console.log("submit!");
-};
 
 const searchNodeIdByAttrId = (attrId: string) => {
   const node = props.graph.nodes.find((node) => {
@@ -214,10 +209,6 @@ const showModifyInstructionDialog = (scope: any) => {
   state.modifyInstructionDialogVisible = true;
   state.modifyInstructionScope = scope;
   state.modifyInstructionWord = scope.row.instruction;
-};
-
-const consoleScope = (scope: any) => {
-  console.log(scope);
 };
 
 const modifyInstructionWord = async () => {
@@ -283,7 +274,8 @@ const addEdge = async () => {
   state.formInline.text = "";
   state.addEdgeFormVisible = false;
   console.log("Add edge");
-  // router.go(0);
+  await nextTick();
+  router.go(0);
 };
 
 const deleteEdge = async (scope: any) => {

@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, defineProps, onMounted, ref } from "vue";
+import { reactive, defineProps, onMounted, ref, nextTick } from "vue";
 import { useProtocolStore } from "@/store";
 import * as models from "@/models";
 import * as api from "@/api";
@@ -66,6 +66,7 @@ import GraphTable from "@/components/GraphTable.vue";
 import type { UploadInstance, UploadProps, UploadRawFile } from "element-plus";
 import { genFileId } from "element-plus";
 import { Download } from "@element-plus/icons-vue";
+import router from "@/router";
 
 const protocolStore = useProtocolStore();
 
@@ -98,8 +99,10 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
   upload.value!.handleStart(file);
 };
 
-const submitUpload = () => {
+const submitUpload = async () => {
   upload.value!.submit();
+  await nextTick();
+  router.go(0);
 };
 
 onMounted(async () => {
