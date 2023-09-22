@@ -5,7 +5,7 @@
       placeholder="Please input"
       class="input-with-select"
       size="large"
-      @keyup.enter.once="search"
+      @keyup.enter="search"
     >
       <template #append>
         <el-button :icon="Search" @click="search" />
