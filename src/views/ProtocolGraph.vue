@@ -16,7 +16,15 @@
             </a>
           </el-button>
         </div>
-        <GraphTable :graph="state.graph" :filename="state.filename" />
+        <GraphTable
+          :graph="state.graph"
+          :filename="state.filename"
+          @add-attr="addAttr"
+          @delete-attr="deleteAttr"
+          @add-edge="addEdge"
+          @delete-edge="deleteEdge"
+          @modify-instruction="modifyInstruction"
+        />
       </div>
       <div v-else>
         <div class="hint">
@@ -64,7 +72,7 @@ import { useRoute } from "vue-router";
 import ProtocalDetail from "@/components/ProtocalDetail.vue";
 import GraphTable from "@/components/GraphTable.vue";
 import type { UploadInstance, UploadProps, UploadRawFile } from "element-plus";
-import { genFileId } from "element-plus";
+import { genFileId, textProps } from "element-plus";
 import { Download } from "@element-plus/icons-vue";
 import router from "@/router";
 
@@ -103,6 +111,81 @@ const submitUpload = async () => {
   upload.value!.submit();
   await nextTick();
   router.go(0);
+};
+
+const addAttr = (
+  nodeId: string,
+  attrId: string,
+  attrType: models.AttributeM,
+  key: string,
+  value: string
+) => {
+  // 在 state.graph 中对应的 node 添加对应类型的 attribute
+  if (attrType == models.AttributeM.emit) {
+    state.graph.nodes.forEach((node) => {
+      if (node.id == nodeId) {
+        node.emits.push({
+          id: attrId,
+          node_id: nodeId,
+          key: key,
+          value: value,
+        });
+      }
+    });
+  } else {
+    state.graph.nodes.forEach((node) => {
+      if (node.id == nodeId) {
+        node.slots.push({
+          id: attrId,
+          node_id: nodeId,
+          key: key,
+          value: value,
+        });
+      }
+    });
+  }
+};
+
+const deleteAttr = (attrId: string) => {
+  // 在 state.graph 中删除对应的 attribute
+  state.graph.nodes.forEach((node) => {
+    node.emits = node.emits.filter((emit) => emit.id != attrId);
+    node.slots = node.slots.filter((slot) => slot.id != attrId);
+    console.log("node.emits", node.emits);
+  });
+  // 删除掉包含该 attribute 的 edge
+  state.graph.edges = state.graph.edges.filter(
+    (edge) => edge.source.attr_id != attrId && edge.target.attr_id != attrId
+  );
+};
+
+const addEdge = (
+  edgeId: string,
+  source: models.Source,
+  target: models.Target,
+  text: string
+) => {
+  // 在 state.graph 中添加对应的 edge
+  state.graph.edges.push({
+    id: edgeId,
+    text: text,
+    source: source,
+    target: target,
+  });
+};
+
+const deleteEdge = (edgeId: string) => {
+  // 在 state.graph 中删除对应的 edge
+  state.graph.edges = state.graph.edges.filter((edge) => edge.id != edgeId);
+};
+
+const modifyInstruction = (nodeId: string, instruction: string) => {
+  // 在 state.graph 中修改对应的 node 的 instruction
+  state.graph.nodes.forEach((node) => {
+    if (node.id == nodeId) {
+      node.instruction = instruction;
+    }
+  });
 };
 
 onMounted(async () => {

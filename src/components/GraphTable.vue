@@ -155,7 +155,14 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, ref, reactive, nextTick } from "vue";
+import {
+  defineProps,
+  ref,
+  reactive,
+  nextTick,
+  onMounted,
+  defineEmits,
+} from "vue";
 import * as models from "@/models";
 import * as api from "@/api";
 import { ElMessageBox } from "element-plus";
@@ -191,6 +198,27 @@ const searchNodeIdByAttrId = (attrId: string) => {
 };
 
 const props = defineProps<{ graph: models.GraphM; filename: string }>();
+// 基于类型
+const emits = defineEmits<{
+  (
+    e: "add-attr",
+    nodeId: string,
+    attrId: string,
+    attrType: models.AttributeM,
+    key: string,
+    value: string
+  ): void;
+  (e: "delete-attr", attrId: string): void;
+  (
+    e: "add-edge",
+    edgeId: string,
+    source: models.Source,
+    target: models.Target,
+    text: string
+  ): void;
+  (e: "delete-edge", edgeId: string): void;
+  (e: "modify-instruction", nodeId: string, newInstruction: string): void;
+}>();
 
 // 1. 修改指令字
 // 2. 添加 Slot/Emit
@@ -220,32 +248,43 @@ const modifyInstructionWord = async () => {
     modifyInstructionScope.row.id,
     state.modifyInstructionWord
   );
+  emits(
+    "modify-instruction",
+    modifyInstructionScope.row.id,
+    state.modifyInstructionWord
+  );
   state.modifyInstructionDialogVisible = false;
-  router.go(0);
 };
 
 const deleteAttr = async (scope: any) => {
   const nodeId = searchNodeIdByAttrId(scope.row.id) as string;
   await api.reqDeleteAttr(props.filename, nodeId, scope.row.id);
+  emits("delete-attr", scope.row.id);
   console.log("deleteAttr", scope);
-  router.go(0);
 };
 
 const addAttr = async () => {
   const addingAttrScope = state.addingAttrScope as { row: { id: string } };
   const nodeId = searchNodeIdByAttrId(addingAttrScope.row.id) as string;
-  await api.reqAddAttr(
+  const newAttrId = await api.reqAddAttr(
     props.filename,
     nodeId,
     state.formInDialog.key,
     state.formInDialog.value,
     state.addingAtrrType
   );
+  emits(
+    "add-attr",
+    nodeId,
+    newAttrId,
+    state.addingAtrrType,
+    state.formInDialog.key,
+    state.formInDialog.value
+  );
   console.log("addAttr");
   state.addAtrrDialogVisible = false;
   state.formInDialog.key = "";
   state.formInDialog.value = "";
-  router.go(0);
 };
 
 const addEdge = async () => {
@@ -255,35 +294,40 @@ const addEdge = async () => {
     ElMessageBox.alert("Source or target not found");
     return;
   }
-  const source = {
+  const source: models.Source = {
     node_id: sourceNodeId,
     attr_id: state.formInline.source,
   };
-  const target = {
+  const target: models.Target = {
     node_id: targetNodeId,
     attr_id: state.formInline.target,
   };
-  const res = await api.reqAddEdge(
+  const newEdgeId = await api.reqAddEdge(
     props.filename,
     source,
     target,
     state.formInline.text
   );
+  emits("add-edge", newEdgeId, source, target, state.formInline.text);
   state.formInline.source = "";
   state.formInline.target = "";
   state.formInline.text = "";
   state.addEdgeFormVisible = false;
   console.log("Add edge");
   await nextTick();
-  router.go(0);
 };
 
 const deleteEdge = async (scope: any) => {
   await api.reqDeleteEdge(props.filename, scope.row.id);
-  router.go(0);
+  emits("delete-edge", scope.row.id);
 };
 
 const dialogVisible = ref(false);
+
+onMounted(() => {
+  console.log("props", props);
+  console.log("props.graph", props.graph);
+});
 </script>
 
 <style lang="scss">

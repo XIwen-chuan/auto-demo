@@ -127,7 +127,7 @@ export async function reqAddEdge(
     method: "post",
   });
   console.log("reqAddEdge");
-  return true;
+  return res.data.edge_id;
 }
 
 export async function reqDeleteEdge(filename: string, id: string) {
@@ -194,13 +194,13 @@ export async function reqAddAttr(
     value,
     attr_type: type,
   };
-  await requests({
+  const res = await requests({
     url: "api/attr/",
     params,
     method: "post",
   });
   console.log("reqAddAttr");
-  return true;
+  return res.data.attr_id;
 }
 
 // done
