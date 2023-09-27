@@ -14,7 +14,7 @@ const requests = axios.create({
 
 // 请求拦截器
 requests.interceptors.request.use((config: any) => {
-  config.headers.Authorization = `ApiKey UUJDQ2tvb0JDM05WcEFFUXJ2UXQ6cTBJY0hYdGdRaXlXbm4zWFlMZWhZQQ==`;
+  config.headers.Authorization = `ApiKey X05FNzBvb0JpdXl5QzdjUmFSMUI6S0dDOFNtcXFTcmFJWEhmdm9GM2s3dw==`;
   return config;
 });
 

@@ -211,6 +211,8 @@ onMounted(async () => {
   console.log("resProtocalInfo", resProtocalInfo);
   console.log("resProtocalGraph", resProtocalGraph);
   state.loading = false;
+
+  api.reqGetHumanModifiedIsaJson();
 });
 </script>
 

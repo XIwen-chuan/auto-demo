@@ -4,6 +4,9 @@ import * as models from "@/models";
 import Qs from "qs";
 import requests from "./requests";
 import { ElMessage } from "element-plus";
+import { useProtocolStore } from "@/store";
+
+const protocolStore = useProtocolStore();
 
 // export async function reqLink(
 //   sourceAttrId: number | string,
@@ -210,4 +213,13 @@ export async function reqUploadOldGraphJson() {
 
 export async function reqDownloadGraphJson(filename: string) {
   console.log("reqDownloadGraphJson");
+}
+
+export async function reqGetHumanModifiedIsaJson() {
+  const res = await requests({
+    url: "api/isa/",
+    method: "get",
+  });
+  console.log("reqGetHumanModifiedIsaJson");
+  protocolStore.storeHumanModifiedIsa(res.data);
 }

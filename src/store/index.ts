@@ -11,6 +11,7 @@ export const useProtocolStore = defineStore("protocolStore", {
     count: 0,
     name: "Eduardo",
     initialProtocolList: [],
+    humanModifiedIsa: {} as any,
   }),
   getters: {
     doubleCount: (state) => state.count * 2,
@@ -38,6 +39,9 @@ export const useProtocolStore = defineStore("protocolStore", {
     },
     reportNotFoundError(name: string) {
       ElMessage.info(name + " not found.");
+    },
+    storeHumanModifiedIsa(humanModifiedIsa: any) {
+      this.humanModifiedIsa = humanModifiedIsa;
     },
   },
 });

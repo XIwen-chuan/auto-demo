@@ -17,8 +17,8 @@
               </el-button>
               <el-table :data="scope.row.slots">
                 <el-table-column label="Id" prop="id" />
-                <el-table-column label="Key" prop="key" />
-                <el-table-column label="Value" prop="value" />
+                <el-table-column label="Argument Name" prop="key" />
+                <el-table-column label="Argument Value" prop="value" />
                 <el-table-column label="">
                   <template #default="scope">
                     <el-button @click="deleteAttr(scope)"> delete </el-button>
@@ -128,17 +128,17 @@
           :model="state.formInDialog"
           class="demo-form-inline"
         >
-          <el-form-item label="Key">
+          <el-form-item label="Argument Name">
             <el-input
               v-model="state.formInDialog.key"
-              placeholder="Key"
+              placeholder="Argument Name"
               clearable
             />
           </el-form-item>
-          <el-form-item label="Value">
+          <el-form-item label="Argument Value">
             <el-input
               v-model="state.formInDialog.value"
-              placeholder="Value"
+              placeholder="Argument Value"
               clearable
             />
           </el-form-item>
