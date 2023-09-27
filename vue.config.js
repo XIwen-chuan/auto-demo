@@ -24,7 +24,7 @@ module.exports = defineConfig({
       },
       "/search-test": {
         target:
-          "https://cc94467d881a4334a44fd40e5d12085a.asia-east1.gcp.elastic-cloud.com:443",
+          "https://666daf42d5da46119d01b21071f9624e.asia-southeast1.gcp.elastic-cloud.com:443",
         ws: true,
         changeOrigin: true,
       },
