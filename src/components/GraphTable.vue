@@ -1,7 +1,14 @@
+<!-- eslint-disable @typescript-eslint/ban-ts-comment -->
 <template>
   <div class="_graph-table">
     <div class="nodes">
-      <el-table :data="props.graph.nodes" style="width: 100%">
+      <el-input
+        class="filter-search"
+        v-model="state.nodeSearch"
+        size="small"
+        placeholder="Type to search"
+      />
+      <el-table :data="filterNodes" style="width: 100%">
         <el-table-column type="expand">
           <template #default="scope">
             <div m="4" class="attr_table">
@@ -44,8 +51,8 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Text" prop="text" />
-        <el-table-column label="Instruction" prop="instruction" />
+        <el-table-column label="Text" prop="text" sortable />
+        <el-table-column label="Instruction" prop="instruction" sortable />
       </el-table>
     </div>
     <el-divider direction="vertical" />
@@ -74,10 +81,30 @@
           </el-form-item>
         </el-form>
       </div>
-      <el-table :data="props.graph.edges" style="width: 100%">
-        <el-table-column label="Text" prop="text" />
-        <el-table-column label="Source" prop="source.attr_id" />
-        <el-table-column label="Target" prop="target.attr_id" />
+      <el-input
+        class="filter-search"
+        v-model="state.edgeSearch"
+        size="small"
+        placeholder="Type to search"
+      />
+      <el-table :data="filterEdges" style="width: 100%">
+        <el-table-column type="expand">
+          <template #default="scope">
+            <div m="4" class="attr_table">
+              <h3>Source Attr ID</h3>
+              <div>{{ scope.row.source.attr_id }}</div>
+              <h3>Source Node ID</h3>
+              <div>{{ scope.row.source.node_id }}</div>
+              <h3>Target Attr ID</h3>
+              <div>{{ scope.row.target.attr_id }}</div>
+              <h3>Target Node ID</h3>
+              <div>{{ scope.row.target.node_id }}</div>
+            </div>
+          </template>
+        </el-table-column>
+        <!-- <el-table-column label="Text" prop="text" /> -->
+        <el-table-column label="Source Text" prop="source.text" />
+        <el-table-column label="Target Text" prop="target.text" />
         <el-table-column label="">
           <template #default="scope">
             <el-button @click="deleteEdge(scope)"> delete </el-button>
@@ -104,13 +131,24 @@
     <div class="dialogs">
       <el-dialog
         v-model="state.modifyInstructionDialogVisible"
-        title="Tips"
+        title=""
         width="30%"
       >
-        <el-input
-          placeholder="New instruction"
+        <el-select
           v-model="state.modifyInstructionWord"
-        />
+          filterable
+          remote
+          reserve-keyword
+          placeholder="Please enter a keyword"
+          :remote-method="filterIntructions"
+        >
+          <el-option
+            v-for="(item, index) in state.instructionFiltered"
+            :key="index"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
         <template #footer>
           <span class="dialog-footer">
             <el-button @click="state.modifyInstructionDialogVisible = false"
@@ -122,18 +160,26 @@
           </span>
         </template>
       </el-dialog>
-      <el-dialog v-model="state.addAtrrDialogVisible" title="Tips" width="30%">
+      <el-dialog v-model="state.addAtrrDialogVisible" title="" width="30%">
         <el-form
           :inline="true"
           :model="state.formInDialog"
           class="demo-form-inline"
         >
           <el-form-item label="Argument Name">
-            <el-input
+            <el-select
               v-model="state.formInDialog.key"
-              placeholder="Argument Name"
-              clearable
-            />
+              filterable
+              reserve-keyword
+              placeholder="Please choose"
+            >
+              <el-option
+                v-for="(item, index) in filterAttrs"
+                :key="index"
+                :label="item"
+                :value="item"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="Argument Value">
             <el-input
@@ -145,7 +191,7 @@
           <el-form-item>
             <el-button type="primary" @click="addAttr">Confirm</el-button>
             <el-button @click="state.addAtrrDialogVisible = false"
-              >Save and close</el-button
+              >Close</el-button
             >
           </el-form-item>
         </el-form>
@@ -162,11 +208,14 @@ import {
   nextTick,
   onMounted,
   defineEmits,
+  computed,
 } from "vue";
 import * as models from "@/models";
 import * as api from "@/api";
 import { ElMessageBox } from "element-plus";
-import router from "@/router";
+import { useProtocolStore } from "@/store";
+
+const protocolStore = useProtocolStore();
 
 const state = reactive({
   modifyInstructionDialogVisible: false,
@@ -176,6 +225,9 @@ const state = reactive({
   addAtrrDialogVisible: false,
   addingAtrrType: models.AttributeM.slot,
   addingAttrScope: {},
+  nodeSearch: "",
+  edgeSearch: "",
+  instructionFiltered: [] as any[],
   formInline: {
     source: "",
     target: "",
@@ -185,7 +237,78 @@ const state = reactive({
     key: "",
     value: "",
   },
+  humanModifiedIsa: {},
 });
+
+const filterIntructions = (query: string) => {
+  try {
+    if (query) {
+      console.log(
+        "Object.keys(state.humanModifiedIsa)",
+        Object.keys(state.humanModifiedIsa)
+      );
+      state.instructionFiltered = Object.keys(state.humanModifiedIsa).filter(
+        (item) => {
+          return item.toLowerCase().includes(query.toLowerCase());
+        }
+      );
+    } else {
+      state.instructionFiltered = [];
+    }
+  } catch (error) {
+    state.instructionFiltered = [];
+  }
+};
+
+const filterAttrs = computed(() => {
+  try {
+    return Object.keys(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      state.humanModifiedIsa[state.addingAttrScope.row.instruction][
+        state.addingAtrrType
+      ]
+    );
+  } catch (error) {
+    return [];
+  }
+});
+
+const filterNodes = computed(() =>
+  props.graph.nodes
+    ? props.graph.nodes.filter(
+        (data) =>
+          !state.nodeSearch ||
+          data.text.toLowerCase().includes(state.nodeSearch.toLowerCase()) ||
+          data.instruction
+            .toLowerCase()
+            .includes(state.nodeSearch.toLowerCase()) ||
+          data.id.toLowerCase().includes(state.nodeSearch.toLowerCase())
+      )
+    : []
+);
+
+const filterEdges = computed(() =>
+  props.graph.edges
+    ? props.graph.edges.filter(
+        (data) =>
+          !state.edgeSearch ||
+          data.text.toLowerCase().includes(state.edgeSearch.toLowerCase()) ||
+          data.source.attr_id
+            .toLowerCase()
+            .includes(state.edgeSearch.toLowerCase()) ||
+          data.target.attr_id
+            .toLowerCase()
+            .includes(state.edgeSearch.toLowerCase()) ||
+          data.source.node_id
+            .toLowerCase()
+            .includes(state.edgeSearch.toLowerCase()) ||
+          data.target.node_id
+            .toLowerCase()
+            .includes(state.edgeSearch.toLowerCase())
+      )
+    : []
+);
 
 const searchNodeIdByAttrId = (attrId: string) => {
   const node = props.graph.nodes.find((node) => {
@@ -229,6 +352,8 @@ const emits = defineEmits<{
 const showAddattrDialog = (attrType: models.AttributeM, scope: any) => {
   state.addingAttrScope = scope;
   state.addingAtrrType = attrType;
+  state.formInDialog.key = "";
+  state.formInDialog.value = "";
   state.addAtrrDialogVisible = true;
 };
 
@@ -324,9 +449,11 @@ const deleteEdge = async (scope: any) => {
 
 const dialogVisible = ref(false);
 
-onMounted(() => {
+onMounted(async () => {
+  await api.reqGetHumanModifiedIsaJson();
   console.log("props", props);
   console.log("props.graph", props.graph);
+  state.humanModifiedIsa = protocolStore.getHumanModifiedIsa();
 });
 </script>
 
@@ -339,6 +466,9 @@ onMounted(() => {
   align-items: stretch;
   .nodes {
     flex: 1;
+    .filter-search {
+      margin: 10px;
+    }
     .attr_table {
       box-sizing: border-box;
       padding: 10px;
@@ -351,6 +481,14 @@ onMounted(() => {
   }
   .edges {
     flex: 1;
+    .filter-search {
+      margin: 10px;
+    }
+    .attr_table {
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
   }
 }
 </style>

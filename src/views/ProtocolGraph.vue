@@ -188,6 +188,69 @@ const modifyInstruction = (nodeId: string, instruction: string) => {
   });
 };
 
+function topologicalSort(graph: models.GraphM): models.Node[] {
+  const result: models.Node[] = [];
+  const visited: Record<string, boolean> = {};
+
+  function visit(node: models.Node) {
+    if (!visited[node.id]) {
+      visited[node.id] = true;
+      node.slots.forEach((slot) => {
+        const targetNode = graph.nodes.find((n) => n.id === slot.node_id);
+        if (targetNode) {
+          visit(targetNode);
+        }
+      });
+      result.unshift(node);
+    }
+  }
+
+  graph.nodes.forEach((node) => {
+    if (!visited[node.id]) {
+      visit(node);
+    }
+  });
+
+  return result;
+}
+
+// 对 resProtocalGraph 进行拓扑排序
+function topologicalSortGraph(graph: models.GraphM): models.GraphM {
+  const sortedNodes = topologicalSort(graph);
+
+  // 创建一个新的图对象，将节点和边按照排序后的顺序重新组织
+  const sortedGraph: models.GraphM = {
+    ...graph,
+    nodes: sortedNodes,
+    edges: [],
+  };
+
+  // 重组边的顺序
+  graph.edges.forEach((edge) => {
+    const sourceNode = sortedNodes.find(
+      (node) => node.id === edge.source.node_id
+    );
+    const targetNode = sortedNodes.find(
+      (node) => node.id === edge.target.node_id
+    );
+    if (sourceNode && targetNode) {
+      sortedGraph.edges.push({
+        ...edge,
+        source: {
+          ...edge.source,
+          node_id: sourceNode.id,
+        },
+        target: {
+          ...edge.target,
+          node_id: targetNode.id,
+        },
+      });
+    }
+  });
+
+  return sortedGraph;
+}
+
 onMounted(async () => {
   // 1.获取 protocol detail
   // 2. 获取相应的 graph detail
@@ -205,14 +268,15 @@ onMounted(async () => {
     protocolStore.reportNotFoundError("Graph");
     state.noGraph = true;
   } else {
-    state.graph = resProtocalGraph;
+    const sortedGraph = topologicalSortGraph(resProtocalGraph);
+    console.log("sortedGraph", sortedGraph);
+    // 对 resProtocalGraph 进行拓扑排序
+    state.graph = sortedGraph;
   }
   state.uploadHeader = { "Protocol-Filename": state.filename };
   console.log("resProtocalInfo", resProtocalInfo);
   console.log("resProtocalGraph", resProtocalGraph);
   state.loading = false;
-
-  api.reqGetHumanModifiedIsaJson();
 });
 </script>
 

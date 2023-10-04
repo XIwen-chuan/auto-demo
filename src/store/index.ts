@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import { defineStore } from "pinia";
+import * as models from "@/models";
 
 // You can name the return value of `defineStore()` anything you want,
 // but it's best to use the name of the store and surround it with `use`
@@ -42,6 +43,9 @@ export const useProtocolStore = defineStore("protocolStore", {
     },
     storeHumanModifiedIsa(humanModifiedIsa: any) {
       this.humanModifiedIsa = humanModifiedIsa;
+    },
+    getHumanModifiedIsa() {
+      return this.humanModifiedIsa;
     },
   },
 });

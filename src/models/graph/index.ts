@@ -25,11 +25,13 @@ export interface Node {
 }
 
 export interface Source {
+  text?: string;
   node_id: string;
   attr_id: string;
 }
 
 export interface Target {
+  text?: string;
   node_id: string;
   attr_id: string;
 }
