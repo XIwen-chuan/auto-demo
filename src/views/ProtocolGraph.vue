@@ -166,7 +166,7 @@ const addEdge = (
   text: string
 ) => {
   // 在 state.graph 中添加对应的 edge
-  state.graph.edges.push({
+  state.graph.edges.unshift({
     id: edgeId,
     text: text,
     source: source,

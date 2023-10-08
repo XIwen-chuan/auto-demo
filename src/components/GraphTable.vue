@@ -70,9 +70,9 @@
           <el-form-item label="Target attribute id">
             <el-input v-model="state.formInline.target" clearable />
           </el-form-item>
-          <el-form-item label="Text">
+          <!-- <el-form-item label="Text">
             <el-input v-model="state.formInline.text" clearable />
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
             <el-button type="primary" @click="addEdge">Confirm</el-button>
             <el-button @click="state.addEdgeFormVisible = false"
@@ -414,16 +414,24 @@ const addAttr = async () => {
 
 const addEdge = async () => {
   const sourceNodeId = searchNodeIdByAttrId(state.formInline.source);
+  const sourceText = props.graph.nodes.find(
+    (node) => node.id === sourceNodeId
+  )?.text;
   const targetNodeId = searchNodeIdByAttrId(state.formInline.target);
+  const targetText = props.graph.nodes.find(
+    (node) => node.id === targetNodeId
+  )?.text;
   if (!sourceNodeId || !targetNodeId) {
     ElMessageBox.alert("Source or target not found");
     return;
   }
   const source: models.Source = {
+    text: sourceText,
     node_id: sourceNodeId,
     attr_id: state.formInline.source,
   };
   const target: models.Target = {
+    text: targetText,
     node_id: targetNodeId,
     attr_id: state.formInline.target,
   };
