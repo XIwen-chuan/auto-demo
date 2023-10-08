@@ -1,8 +1,8 @@
-docker stop my-app
-docker rm my-app
-docker build . -t my-app
+docker stop auto-demo
+docker rm auto-demo
+docker build . -t auto-demo
 docker run \
--d --name my-app \
+-d --name auto-demo \
 --add-host host.docker.internal:host-gateway \
 --network=host \
-my-app
+auto-demo
