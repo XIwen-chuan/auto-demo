@@ -251,6 +251,26 @@ function topologicalSortGraph(graph: models.GraphM): models.GraphM {
   return sortedGraph;
 }
 
+function addRelatedEdgesToNodes(graph: models.GraphM): models.GraphM {
+  const newGraph: models.GraphM = {
+    ...graph,
+    nodes: [],
+  };
+
+  graph.nodes.forEach((node) => {
+    const relatedEdges = graph.edges.filter(
+      (edge) =>
+        edge.source.node_id === node.id || edge.target.node_id === node.id
+    );
+    newGraph.nodes.push({
+      ...node,
+      relatedEdges,
+    });
+  });
+
+  return newGraph;
+}
+
 onMounted(async () => {
   // 1.获取 protocol detail
   // 2. 获取相应的 graph detail
@@ -269,9 +289,14 @@ onMounted(async () => {
     state.noGraph = true;
   } else {
     const sortedGraph = topologicalSortGraph(resProtocalGraph);
-    console.log("sortedGraph", sortedGraph);
+    const reverseGraph = {
+      ...sortedGraph,
+      nodes: sortedGraph.nodes.reverse(),
+    };
+    const graphAddedRelatedEdges = addRelatedEdgesToNodes(reverseGraph);
+    console.log("sortedGraph", graphAddedRelatedEdges);
     // 对 resProtocalGraph 进行拓扑排序
-    state.graph = sortedGraph;
+    state.graph = graphAddedRelatedEdges;
   }
   state.uploadHeader = { "Protocol-Filename": state.filename };
   console.log("resProtocalInfo", resProtocalInfo);

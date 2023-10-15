@@ -45,6 +45,7 @@ const menuItemClickHandler = (itemIndex: number) => {
   }
   .el-aside {
     background-color: var(--primary-light7);
+    width: 170px;
   }
   .el-container {
     min-height: calc(100vh - 60px);

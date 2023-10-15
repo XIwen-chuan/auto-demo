@@ -12,14 +12,14 @@
       </p>
     </div>
     <div class="paper-details">
-      <p>
+      <span>
         URL:
         <a :href="props.tableData.attributes.doiUrl">{{
           props.tableData.attributes.doiUrl
         }}</a>
-      </p>
-      <p>Creation Time: {{ props.tableData.attributes.createdAt }}</p>
-      <p>Institution: {{ props.tableData.attributes.institution }}</p>
+      </span>
+      <span>Creation Time: {{ props.tableData.attributes.createdAt }}</span>
+      <span>Institution: {{ props.tableData.attributes.institution }}</span>
     </div>
   </div>
 </template>
@@ -54,8 +54,8 @@ const props = defineProps<{
   .paper-details {
     font-size: 14px;
 
-    p {
-      margin: 5px 0;
+    span {
+      margin: 0 50px;
     }
 
     a {

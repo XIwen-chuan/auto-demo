@@ -20,6 +20,7 @@ export interface Node {
   id: string;
   text: string;
   instruction: string;
+  relatedEdges?: Edge[];
   slots: Slot[];
   emits: Emit[];
 }

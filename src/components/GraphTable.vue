@@ -8,14 +8,20 @@
         size="small"
         placeholder="Type to search"
       />
-      <el-table :data="filterNodes" style="width: 100%">
-        <el-table-column type="expand">
+      <el-table :data="filterNodes" style="width: 100%" :border="true">
+        <el-table-column type="expand" resizable>
           <template #default="scope">
             <div m="4" class="attr_table">
               <h2>{{ scope.row.instruction }}</h2>
               <el-button @click="showModifyInstructionDialog(scope)"
                 >Edit instruction word</el-button
               >
+              <h3>Related edges</h3>
+              <el-table :data="scope.row.relatedEdges">
+                <el-table-column label="Id" prop="id" />
+                <el-table-column label="Source node" prop="source.text" />
+                <el-table-column label="Target node" prop="target.text" />
+              </el-table>
               <h3>Slots</h3>
               <el-button
                 @click="showAddattrDialog(models.AttributeM.slot, scope)"
@@ -51,8 +57,13 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Text" prop="text" sortable />
-        <el-table-column label="Instruction" prop="instruction" sortable />
+        <el-table-column label="Text" prop="text" sortable resizable />
+        <el-table-column
+          label="Instruction"
+          prop="instruction"
+          width="110px"
+          sortable
+        />
       </el-table>
     </div>
     <el-divider direction="vertical" />
@@ -87,7 +98,7 @@
         size="small"
         placeholder="Type to search"
       />
-      <el-table :data="filterEdges" style="width: 100%">
+      <el-table :data="filterEdges" style="width: 100%" :border="true">
         <el-table-column type="expand">
           <template #default="scope">
             <div m="4" class="attr_table">
@@ -105,7 +116,7 @@
         <!-- <el-table-column label="Text" prop="text" /> -->
         <el-table-column label="Source Text" prop="source.text" />
         <el-table-column label="Target Text" prop="target.text" />
-        <el-table-column label="">
+        <el-table-column label="" width="110px">
           <template #default="scope">
             <el-button @click="deleteEdge(scope)"> delete </el-button>
           </template>
@@ -472,6 +483,10 @@ onMounted(async () => {
   padding: 10px;
   display: flex;
   align-items: stretch;
+  font-size: 8px;
+  .el-table {
+    font-size: 8px;
+  }
   .nodes {
     flex: 1;
     .filter-search {
