@@ -1,6 +1,7 @@
 FROM node:16
 COPY ./ /app
 WORKDIR /app
+RUN npm config set -g registry https://registry.npm.taobao.org
 RUN npm install && npm run build
 
 FROM nginx
