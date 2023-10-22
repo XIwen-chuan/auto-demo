@@ -171,7 +171,42 @@
           </span>
         </template>
       </el-dialog>
-      <el-dialog v-model="state.addAtrrDialogVisible" title="" width="30%">
+      <el-dialog
+        v-model="state.addAtrrDialogVisible"
+        title=""
+        width="30%"
+        class="add-atrr-dialog"
+      >
+        <div
+          class="candidates"
+          v-if="
+            filterSlotsCandidates.length &&
+            state.addingAtrrType == models.AttributeM.slot
+          "
+        >
+          <div
+            v-for="(candidate, index) in filterSlotsCandidates"
+            :key="index"
+            class="candidate"
+          >
+            <span class="candidate-param">Key:</span> {{ candidate.key }}
+            <span class="candidate-param">Value:</span> {{ candidate.value }}
+            <button
+              @click="
+                addAttr(
+                  true,
+                  candidate.node_id,
+                  candidate.key,
+                  candidate.value,
+                  candidate.id
+                )
+              "
+            >
+              select
+            </button>
+          </div>
+        </div>
+        <div class="middle">or you can:</div>
         <el-form
           :inline="true"
           :model="state.formInDialog"
@@ -200,7 +235,9 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="addAttr">Confirm</el-button>
+            <el-button type="primary" @click="addAttr(false, '', '', '')"
+              >Confirm</el-button
+            >
             <el-button @click="state.addAtrrDialogVisible = false"
               >Close</el-button
             >
@@ -283,6 +320,43 @@ const filterAttrs = computed(() => {
   } catch (error) {
     return [];
   }
+});
+
+const filterSlotsCandidates = computed(() => {
+  // 找到指向该 node 的所有 node，将它们的 emits 列出来以作为该 node 的 slots 的 value 的候选项
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  console.log("state.addingAttrScope.row", state.addingAttrScope.row);
+  const nodes = [] as models.Node[];
+  const edges = props.graph.edges.filter(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    (edge) => edge.target.node_id === state.addingAttrScope.row.id
+  );
+  console.log("candidates edges", edges);
+  edges.forEach((edge) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const node = props.graph.nodes.find(
+      (node) => node.id === edge.source.node_id
+    );
+    if (node) {
+      nodes.push(node);
+    }
+  });
+  if (nodes.length === 0) {
+    return [];
+  }
+  console.log("candidates nodes", nodes);
+  // 提取所有 nodes 的 emits 组合到一个数组中，每个元素是一个 EmitM 类型
+  const candidates: models.Emit[] = [];
+  nodes.forEach((node) => {
+    node.emits.forEach((emit) => {
+      candidates.push(emit);
+    });
+  });
+  console.log("candidates", candidates);
+  return candidates;
 });
 
 const filterNodes = computed(() =>
@@ -399,24 +473,77 @@ const deleteAttr = async (scope: any) => {
   console.log("deleteAttr", scope);
 };
 
-const addAttr = async () => {
+const addAttr = async (
+  isAuto: boolean,
+  candidateNodeId: string,
+  key: string,
+  value: string,
+  candidateId: string
+) => {
   const addingAttrScope = state.addingAttrScope as { row: { id: string } };
   const nodeId = searchNodeIdByAttrId(addingAttrScope.row.id) as string;
-  const newAttrId = await api.reqAddAttr(
-    props.filename,
-    nodeId,
-    state.formInDialog.key,
-    state.formInDialog.value,
-    state.addingAtrrType
-  );
-  emits(
-    "add-attr",
-    nodeId,
-    newAttrId,
-    state.addingAtrrType,
-    state.formInDialog.key,
-    state.formInDialog.value
-  );
+  if (isAuto) {
+    const newAttrId = await api.reqAddAttr(
+      props.filename,
+      addingAttrScope.row.id,
+      key,
+      value,
+      state.addingAtrrType
+    );
+    emits(
+      "add-attr",
+      addingAttrScope.row.id,
+      newAttrId,
+      state.addingAtrrType,
+      key,
+      value
+    );
+
+    // 然后添加 edge
+    const sourceNodeId = searchNodeIdByAttrId(candidateId);
+    const sourceText = props.graph.nodes.find(
+      (node) => node.id === sourceNodeId
+    )?.text;
+    const targetNodeId = addingAttrScope.row.id;
+    const targetText = props.graph.nodes.find(
+      (node) => node.id === targetNodeId
+    )?.text;
+
+    const source: models.Source = {
+      text: sourceText,
+      node_id: sourceNodeId as string,
+      attr_id: candidateId,
+    };
+    const target: models.Target = {
+      text: targetText,
+      node_id: targetNodeId,
+      attr_id: newAttrId,
+    };
+    const newEdgeId = await api.reqAddEdge(
+      props.filename,
+      source,
+      target,
+      state.formInline.text
+    );
+    emits("add-edge", newEdgeId, source, target, state.formInline.text);
+  } else {
+    const newAttrId = await api.reqAddAttr(
+      props.filename,
+      nodeId,
+      state.formInDialog.key,
+      state.formInDialog.value,
+      state.addingAtrrType
+    );
+    emits(
+      "add-attr",
+      nodeId,
+      newAttrId,
+      state.addingAtrrType,
+      state.formInDialog.key,
+      state.formInDialog.value
+    );
+  }
+
   console.log("addAttr");
   state.addAtrrDialogVisible = false;
   state.formInDialog.key = "";
@@ -511,6 +638,37 @@ onMounted(async () => {
       box-sizing: border-box;
       padding: 10px;
       border: 1px solid #ccc;
+    }
+  }
+  .dialogs {
+    .add-atrr-dialog {
+      width: auto;
+      min-width: 400px;
+      .el-dialog__body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .candidates {
+          margin-right: 40px;
+          .candidate {
+            box-sizing: border-box;
+            padding: 10px;
+            border: 0.5px solid #ccc;
+            .candidate-param {
+              font-weight: 600;
+            }
+          }
+        }
+        .middle {
+          margin: 50px;
+        }
+        .demo-form-inline {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        }
+      }
     }
   }
 }
