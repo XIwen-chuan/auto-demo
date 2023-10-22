@@ -235,7 +235,7 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="addAttr(false, '', '', '')"
+            <el-button type="primary" @click="addAttr(false, '', '', '', '')"
               >Confirm</el-button
             >
             <el-button @click="state.addAtrrDialogVisible = false"
