@@ -110,6 +110,22 @@ export async function reqGetGraph(filename: string) {
   return res.data as models.GraphM;
 }
 
+export async function reqGetCompiledGraph(filename: string) {
+  const params = {
+    filename,
+  };
+  const res = await requests({
+    url: "api/protocol/graph/compiled/",
+    params,
+    method: "get",
+  });
+  if (!res.data.code) {
+    return false;
+  }
+
+  return res.data as models.GraphM;
+}
+
 export async function reqAddEdge(
   filename: string,
   source: models.Source,

@@ -3,6 +3,7 @@
     <div class="info" v-if="!state.loading">
       <ProtocalDetail :table-data="state.protocal" />
     </div>
+    <el-button @click="gotoCompiledPage">Compiled protocol graph</el-button>
     <el-divider />
     <div class="graph" v-loading="state.loading">
       <div v-if="!state.noGraph">
@@ -185,6 +186,15 @@ const modifyInstruction = (nodeId: string, instruction: string) => {
     if (node.id == nodeId) {
       node.instruction = instruction;
     }
+  });
+};
+
+const gotoCompiledPage = () => {
+  router.push({
+    name: "protocolCompiled",
+    params: {
+      filename: state.filename,
+    },
   });
 };
 

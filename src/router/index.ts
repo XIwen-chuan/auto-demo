@@ -19,6 +19,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "protocol",
     component: () => import("@/views/ProtocolGraph.vue"),
   },
+  {
+    path: "/protocol/compiled/:filename",
+    name: "protocolCompiled",
+    component: () => import("@/views/ProtocolGraphCompiled.vue"),
+  },
 ];
 
 const router = createRouter({
