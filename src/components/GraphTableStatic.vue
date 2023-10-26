@@ -16,12 +16,12 @@
               <!-- <el-button @click="showModifyInstructionDialog(scope)"
                 >Edit instruction word</el-button
               > -->
-              <h3>Related edges</h3>
+              <!-- <h3>Related edges</h3>
               <el-table :data="scope.row.relatedEdges">
                 <el-table-column label="Id" prop="id" />
                 <el-table-column label="Source node" prop="source.text" />
                 <el-table-column label="Target node" prop="target.text" />
-              </el-table>
+              </el-table> -->
               <h3>Slots</h3>
               <!-- <el-button
                 @click="showAddattrDialog(models.AttributeM.slot, scope)"
@@ -29,7 +29,7 @@
                 Add
               </el-button> -->
               <el-table :data="scope.row.slots">
-                <el-table-column label="Id" prop="id" />
+                <!-- <el-table-column label="Id" prop="id" /> -->
                 <el-table-column label="Argument Name" prop="key" />
                 <el-table-column label="Argument Value" prop="value" />
                 <!-- <el-table-column label="">
@@ -45,20 +45,20 @@
                 Add
               </el-button> -->
               <el-table :data="scope.row.emits">
-                <el-table-column label="Id" prop="id" />
+                <!-- <el-table-column label="Id" prop="id" /> -->
                 <el-table-column label="Key" prop="key" />
                 <el-table-column label="Value" prop="value" />
               </el-table>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Text" prop="text" sortable resizable />
         <el-table-column
           label="Instruction"
           prop="instruction"
           width="110px"
           sortable
         />
+        <el-table-column label="Text" prop="text" sortable resizable />
       </el-table>
     </div>
   </div>
