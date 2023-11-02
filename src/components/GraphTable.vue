@@ -177,20 +177,23 @@
         width="30%"
         class="add-atrr-dialog"
       >
-        <div
+        <!-- <div
           class="candidates"
           v-if="
             filterSlotsCandidates.length &&
             state.addingAtrrType == models.AttributeM.slot
           "
         >
+          <div class="middle">You can select from candidates:</div>
           <div
             v-for="(candidate, index) in filterSlotsCandidates"
             :key="index"
             class="candidate"
           >
-            <span class="candidate-param">Key:</span> {{ candidate.key }}
-            <span class="candidate-param">Value:</span> {{ candidate.value }}
+            <span class="candidate-param">Argument Name:</span>
+            {{ candidate.key }}
+            <span class="candidate-param">Argument Value:</span>
+            {{ candidate.value }}
             <button
               @click="
                 addAttr(
@@ -214,7 +217,7 @@
           "
         >
           or you can:
-        </div>
+        </div> -->
         <el-form
           :inline="true"
           :model="state.formInDialog"
@@ -223,6 +226,7 @@
           <el-form-item label="Argument Name">
             <el-select
               v-model="state.formInDialog.key"
+              allow-create
               filterable
               reserve-keyword
               placeholder="Please choose"
@@ -236,11 +240,20 @@
             </el-select>
           </el-form-item>
           <el-form-item label="Argument Value">
-            <el-input
+            <el-select
               v-model="state.formInDialog.value"
-              placeholder="Argument Value"
-              clearable
-            />
+              allow-create
+              filterable
+              reserve-keyword
+              placeholder="Please choose"
+            >
+              <el-option
+                v-for="(item, index) in filterSlotsCandidates"
+                :key="index"
+                :label="item.value"
+                :value="item.value"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="addAttr(false, '', '', '', '')"

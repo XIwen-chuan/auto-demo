@@ -316,11 +316,16 @@ onMounted(async () => {
 </script>
 
 <style lang="scss">
-.hint {
-  font-size: 16px;
-  margin-bottom: 20px;
-  .el-upload {
-    margin-right: 20px;
+._protocol-graph {
+  .info {
+    margin-bottom: 20px;
+  }
+  .hint {
+    font-size: 16px;
+    margin-bottom: 20px;
+    .el-upload {
+      margin-right: 20px;
+    }
   }
 }
 </style>

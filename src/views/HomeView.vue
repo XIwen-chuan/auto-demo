@@ -12,7 +12,9 @@
           @current-change="handleCurrentChange"
         />
       </div>
-      <ProtocolList :table-data="state.tableData" />
+      <div v-loading="state.loading" class="list">
+        <ProtocolList :table-data="state.tableData" />
+      </div>
     </div>
     <div class="demo-pagination-block">
       <el-pagination
@@ -45,6 +47,7 @@ const state = reactive({
   tableData: [] as models.ProtocalM[],
   pageSize: 30,
   currentPage: 1,
+  loading: true,
 });
 
 const cellClickHandler = (item: any) => {
@@ -61,11 +64,13 @@ const handleClick = async (item: any) => {
 const handleCurrentChange = async (val: number) => {
   console.log(`current page: ${val}`);
   state.currentPage = val;
+  state.loading = true;
   const res = await getProtocolList();
   if (!res) {
     protocolStore.reportNetworkError();
     return;
   }
+  state.loading = false;
   state.tableData = res;
 };
 
@@ -84,6 +89,7 @@ onMounted(async () => {
     return;
   }
   console.log(res);
+  state.loading = false;
   state.tableData = res;
 });
 </script>
@@ -97,6 +103,9 @@ onMounted(async () => {
     display: flex;
     justify-content: center;
     margin-top: 20px;
+  }
+  .list {
+    min-height: 500px;
   }
 }
 </style>
