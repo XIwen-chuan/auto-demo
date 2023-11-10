@@ -256,9 +256,7 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="addAttr(false, '', '', '', '')"
-              >Confirm</el-button
-            >
+            <el-button type="primary" @click="addAttr()">Confirm</el-button>
             <el-button @click="state.addAtrrDialogVisible = false"
               >Close</el-button
             >
@@ -506,42 +504,44 @@ const deleteAttr = async (scope: any) => {
   console.log("deleteAttr", scope);
 };
 
-const addAttr = async (
-  isAuto: boolean,
-  candidateNodeId: string,
-  key: string,
-  value: string,
-  candidateId: string
-) => {
+const addAttr = async () => {
   const addingAttrScope = state.addingAttrScope as { row: { id: string } };
-  const nodeId = searchNodeIdByAttrId(addingAttrScope.row.id) as string;
-  if (isAuto) {
-    const newAttrId = await api.reqAddAttr(
-      props.filename,
-      addingAttrScope.row.id,
-      key,
-      value,
-      state.addingAtrrType
-    );
-    emits(
-      "add-attr",
-      addingAttrScope.row.id,
-      newAttrId,
-      state.addingAtrrType,
-      key,
-      value
-    );
+  console.log("addingAttrScope", addingAttrScope);
+  const nodeId = addingAttrScope.row.id;
+  const newAttrValue = filterSlotsCandidates.value.find(
+    (candidate) => candidate.value === state.formInDialog.value
+  )?.value as string;
+  const newAttrId = await api.reqAddAttr(
+    props.filename,
+    nodeId,
+    state.formInDialog.key,
+    state.formInDialog.value,
+    state.addingAtrrType
+  );
+  emits(
+    "add-attr",
+    nodeId,
+    newAttrId,
+    state.addingAtrrType,
+    state.formInDialog.key,
+    state.formInDialog.value
+  );
+  console.log("addAttr");
 
-    // 然后添加 edge
+  // 判断 state.formInDialog.value 是否属于 filterSlotsCandidates 中，若不属于，则自动建立链接
+  if (state.addingAtrrType === models.AttributeM.slot && newAttrValue) {
+    const candidateId = filterSlotsCandidates.value.find(
+      (candidate) => candidate.value === state.formInDialog.value
+    )?.id as string;
+    // 属于，说明是新的 slot，需要将新 attr 链接到对应 candidate 中
     const sourceNodeId = searchNodeIdByAttrId(candidateId);
+    const targetNodeId = addingAttrScope.row.id;
     const sourceText = props.graph.nodes.find(
       (node) => node.id === sourceNodeId
     )?.text;
-    const targetNodeId = addingAttrScope.row.id;
     const targetText = props.graph.nodes.find(
       (node) => node.id === targetNodeId
     )?.text;
-
     const source: models.Source = {
       text: sourceText,
       node_id: sourceNodeId as string,
@@ -549,35 +549,18 @@ const addAttr = async (
     };
     const target: models.Target = {
       text: targetText,
-      node_id: targetNodeId,
+      node_id: nodeId,
       attr_id: newAttrId,
     };
     const newEdgeId = await api.reqAddEdge(
       props.filename,
       source,
       target,
-      state.formInline.text
+      state.formInDialog.key
     );
-    emits("add-edge", newEdgeId, source, target, state.formInline.text);
-  } else {
-    const newAttrId = await api.reqAddAttr(
-      props.filename,
-      nodeId,
-      state.formInDialog.key,
-      state.formInDialog.value,
-      state.addingAtrrType
-    );
-    emits(
-      "add-attr",
-      nodeId,
-      newAttrId,
-      state.addingAtrrType,
-      state.formInDialog.key,
-      state.formInDialog.value
-    );
+    emits("add-edge", newEdgeId, source, target, state.formInDialog.key);
   }
 
-  console.log("addAttr");
   state.addAtrrDialogVisible = false;
   state.formInDialog.key = "";
   state.formInDialog.value = "";
@@ -648,7 +631,7 @@ onMounted(async () => {
     font-size: 8px;
   }
   .nodes {
-    flex: 1;
+    flex: 2;
     .filter-search {
       margin: 10px;
     }
