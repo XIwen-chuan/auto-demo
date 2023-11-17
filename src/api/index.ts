@@ -32,7 +32,7 @@ export async function reqSearch(searchStr: string) {
     },
   };
   const res = await requests({
-    url: "search-test/_search?pretty",
+    url: "search-new/_search?pretty",
     data: params,
     method: "post",
   });
