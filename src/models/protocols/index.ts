@@ -162,4 +162,5 @@ export interface ProtocalM {
   title: string;
   content: Content[];
   attributes: Attribute;
+  checked: boolean;
 }

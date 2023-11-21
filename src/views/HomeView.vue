@@ -13,7 +13,10 @@
         />
       </div>
       <div v-loading="state.loading" class="list">
-        <ProtocolList :table-data="state.tableData" />
+        <ProtocolList
+          :table-data="state.tableData"
+          @toggle-checked="toggleChecked"
+        />
       </div>
     </div>
     <div class="demo-pagination-block">
@@ -80,6 +83,15 @@ const getProtocolList = async () => {
     state.pageSize
   );
   return res;
+};
+
+const toggleChecked = (filename: string) => {
+  const identity = filename.split(".")[0].split("_")[1];
+  const index = state.tableData.findIndex((item) => item.identity === identity);
+  if (index === -1) {
+    return;
+  }
+  state.tableData[index].checked = !state.tableData[index].checked;
 };
 
 onMounted(async () => {

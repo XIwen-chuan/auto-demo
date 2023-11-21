@@ -18,6 +18,26 @@
         :width="800"
         :align="`center`"
       />
+      <el-table-column
+        prop="checked"
+        label="Checked"
+        width="100"
+        :filters="[
+          { text: 'Checked', value: true },
+          { text: 'Unchecked', value: false },
+        ]"
+        :filter-method="filterTag"
+        filter-placement="bottom-end"
+      >
+        <template #default="scope">
+          <el-check-tag
+            :checked="scope.row.checked"
+            @change="onTagChange(scope)"
+            disable-transitions
+            >{{ scope.row.checked }}</el-check-tag
+          >
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" label="Operations">
         <template #default="scope">
           <el-button
@@ -41,19 +61,19 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, nextTick, reactive } from "vue";
+import { defineProps, defineEmits } from "vue";
 import * as models from "@/models";
+import * as api from "@/api";
 import router from "@/router";
 const props = defineProps<{
   tableData: models.ProtocalM[];
 }>();
 
-const handleClick = () => {
-  console.log("click");
-};
+const emits = defineEmits<{
+  (e: "toggle-checked", filename: string): void;
+}>();
 
 const detailClickHandler = async (scope: any) => {
-  console.log(scope);
   const path = `https://helixon.yzhu.io/#/protocol-item/${scope.row.identity}/view`;
   window.open(path);
 };
@@ -67,4 +87,25 @@ const graphClickHandler = async (scope: any) => {
     },
   });
 };
+
+const onTagChange = async (scope: any) => {
+  const filename = "protocol_" + scope.row.identity + ".json";
+  console.log("onTagChange", scope);
+  await api.reqToggleProtocolChecked(filename);
+  emits("toggle-checked", filename);
+};
+
+const filterTag = (value: boolean, row: models.ProtocalM) => {
+  return row.checked === value;
+};
 </script>
+
+<style lang="scss">
+._protocol-list {
+  .el-check-tag.is-checked {
+    background-color: #f0f9eb;
+    border-color: #b3e19d;
+    color: #67c23a;
+  }
+}
+</style>

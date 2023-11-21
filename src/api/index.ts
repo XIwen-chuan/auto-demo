@@ -239,3 +239,20 @@ export async function reqGetHumanModifiedIsaJson() {
   console.log("reqGetHumanModifiedIsaJson");
   protocolStore.storeHumanModifiedIsa(res.data);
 }
+
+export async function reqToggleProtocolChecked(filename: string) {
+  const params = {
+    filename,
+  };
+  const res = await requests({
+    url: "api/checked/",
+    params,
+    method: "post",
+  });
+  if (!res.data.code) {
+    ElMessage.error("Network error");
+    return false;
+  }
+
+  return res.data as models.ProtocalM;
+}
