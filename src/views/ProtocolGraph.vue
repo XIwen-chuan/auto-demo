@@ -1,7 +1,10 @@
 <template>
   <div class="_protocol-graph" v-loading="state.loading">
     <div class="info" v-if="!state.loading">
-      <ProtocalDetail :table-data="state.protocal" />
+      <ProtocalDetail
+        :table-data="state.protocal"
+        @toggle-checked="toggleChecked"
+      />
     </div>
     <el-button @click="gotoCompiledPage">Compiled protocol graph</el-button>
     <el-divider />
@@ -280,6 +283,10 @@ function addRelatedEdgesToNodes(graph: models.GraphM): models.GraphM {
 
   return newGraph;
 }
+
+const toggleChecked = () => {
+  state.protocal.checked = !state.protocal.checked;
+};
 
 onMounted(async () => {
   // 1.获取 protocol detail
