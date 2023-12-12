@@ -15,7 +15,13 @@
       <el-table-column
         prop="attributes.keywords"
         label="Keywords"
-        :width="800"
+        :width="600"
+        :align="`center`"
+      />
+      <el-table-column
+        prop="attributes.createdAt"
+        label="CreatedAt"
+        :width="200"
         :align="`center`"
       />
       <el-table-column
