@@ -6,22 +6,17 @@
       :table-layout="'fixed'"
     >
       <el-table-column prop="title" label="Title" :align="`center`" />
-      <el-table-column
-        prop="identity"
-        label="Identity"
-        :width="200"
-        :align="`center`"
-      />
+      <el-table-column prop="identity" label="Identity" :align="`center`" />
       <el-table-column
         prop="attributes.keywords"
         label="Keywords"
-        :width="600"
+        :width="400"
         :align="`center`"
       />
       <el-table-column
         prop="attributes.createdAt"
         label="CreatedAt"
-        :width="200"
+        :width="100"
         :align="`center`"
       />
       <el-table-column
