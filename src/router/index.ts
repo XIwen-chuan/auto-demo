@@ -24,6 +24,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "protocolCompiled",
     component: () => import("@/views/ProtocolGraphCompiled.vue"),
   },
+  {
+    path: "/newui",
+    name: "newUI",
+    component: () => import("@/views/NewUI.vue"),
+  },
 ];
 
 const router = createRouter({
